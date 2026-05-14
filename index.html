@@ -1,1306 +1,165 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Sostituzioni Docenti — Ettore Conti</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#111;min-height:100vh}
-.hidden{display:none!important}
-.app{display:flex;flex-direction:column;min-height:100vh}
-
-/* LOGIN */
-.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a3a6e 0%,#1a56a0 60%,#2980b9 100%)}
-.login-card{background:#fff;border-radius:16px;padding:2.5rem 2.5rem 2rem;width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.18)}
-.login-logo{text-align:center;margin-bottom:1.5rem}
-.login-logo .school-name{font-size:1.1rem;font-weight:700;color:#1a56a0;letter-spacing:0.01em}
-.login-logo .subtitle{font-size:0.78rem;color:#888;margin-top:2px}
-.login-logo .icon-wrap{width:56px;height:56px;background:#e8f0fb;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.6rem}
-.form-group{margin-bottom:1rem}
-.form-group label{display:block;font-size:0.8rem;font-weight:600;color:#444;margin-bottom:0.3rem}
-.form-group input,.form-group select,.form-group textarea{width:100%;border:1px solid rgba(0,0,0,0.15);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.92rem;background:#fafafa;transition:border 0.15s;font-family:inherit}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#1a56a0;background:#fff}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1.1rem;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:inherit;text-decoration:none}
-.btn-primary{background:#1a56a0;color:#fff}
-.btn-primary:hover{background:#154a8a}
-.btn-success{background:#1a7a4a;color:#fff}
-.btn-success:hover{background:#145e38}
-.btn-danger{background:#c0392b;color:#fff}
-.btn-danger:hover{background:#a93226}
-.btn-outline{background:#fff;border:1px solid rgba(0,0,0,0.15);color:#333}
-.btn-outline:hover{background:#f0f0f0}
-.btn-sm{padding:0.3rem 0.75rem;font-size:0.8rem}
-.btn-full{width:100%;justify-content:center;padding:0.7rem}
-.err-msg{background:#fdecea;color:#c0392b;border-radius:6px;padding:0.6rem 0.9rem;font-size:0.83rem;margin-bottom:0.75rem}
-.info-box{background:#e8f0fb;color:#1a3a6e;border-radius:8px;padding:0.75rem 1rem;font-size:0.8rem;margin-top:1rem;line-height:1.6}
-
-/* TOPBAR */
-.topbar{background:#1a3a6e;color:#fff;padding:0 1.5rem;height:56px;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.15);flex-wrap:wrap}
-.topbar .logo{font-weight:700;font-size:1rem;letter-spacing:0.01em;white-space:nowrap}
-.topbar .logo span{color:#7ec8f0;font-size:0.75rem;display:block;font-weight:400}
-.topbar nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
-.nav-btn{background:transparent;border:none;color:rgba(255,255,255,0.75);padding:0.4rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.15s;white-space:nowrap}
-.nav-btn:hover,.nav-btn.active{background:rgba(255,255,255,0.15);color:#fff}
-.topbar-right{display:flex;align-items:center;gap:8px;font-size:0.83rem;color:rgba(255,255,255,0.8)}
-.badge-ruolo{padding:2px 8px;border-radius:12px;font-size:0.72rem}
-.badge-admin{background:#e74c3c}
-.badge-docente{background:#27ae60}
-
-/* MAIN */
-.main{flex:1;padding:1.5rem;max-width:1400px;margin:0 auto;width:100%}
-.page-title{font-size:1.25rem;font-weight:700;color:#1a3a6e;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px}
-.card{background:#fff;border-radius:12px;border:0.5px solid rgba(0,0,0,0.1);padding:1.25rem;margin-bottom:1rem}
-.card-title{font-size:0.92rem;font-weight:700;color:#1a3a6e;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid #f0f0f0}
-
-/* DATE NAV */
-.date-nav{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-.date-nav button.arrow-btn{width:32px;height:32px;border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center}
-.date-nav .cur-date{font-weight:600;font-size:0.95rem;color:#1a3a6e;min-width:200px;text-align:center}
-
-/* TABLE */
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:0.83rem}
-th{background:#f0f4fb;color:#1a3a6e;font-weight:600;padding:0.5rem 0.75rem;text-align:left;border-bottom:2px solid #d0daf0;white-space:nowrap}
-td{padding:0.45rem 0.75rem;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafbff}
-.sede-betti{background:#fff3e0;color:#b05000;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:600;white-space:nowrap}
-.sede-devincenti{background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:600;white-space:nowrap}
-.pill{padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:600}
-.pill-red{background:#fdecea;color:#c0392b}
-.pill-green{background:#e8f5ee;color:#1a7a4a}
-.pill-blue{background:#e8f0fb;color:#1a56a0}
-.pill-orange{background:#fef0e0;color:#c55a00}
-.pill-gray{background:#f0f0f0;color:#555}
-.pill-purple{background:#f3e8ff;color:#6b21a8}
-
-/* GRID */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:700px){.grid2{grid-template-columns:1fr}}
-.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem}
-
-/* ASSENZE */
-.assenza-row{display:flex;align-items:center;gap:10px;padding:0.6rem 0;border-bottom:1px solid #f5f5f5}
-.assenza-row:last-child{border-bottom:none}
-.assenza-info{flex:1}
-.assenza-nome{font-weight:600;font-size:0.88rem}
-.assenza-det{font-size:0.77rem;color:#666;margin-top:2px}
-
-/* UPLOAD */
-.upload-area{border:2px dashed #b0bec5;border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all 0.15s;background:#fafafa}
-.upload-area:hover{border-color:#1a56a0;background:#e8f0fb}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000}
-.modal{background:#fff;border-radius:16px;padding:1.75rem;width:min(520px,95vw);box-shadow:0 12px 40px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto}
-.modal-title{font-size:1.05rem;font-weight:700;color:#1a3a6e;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
-.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;line-height:1;padding:0}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f0f0f0}
-
-/* STAT CARDS */
-.stat-card{background:#f7f7f5;border-radius:10px;padding:0.9rem 1rem;text-align:center}
-.stat-val{font-size:1.8rem;font-weight:700;color:#1a3a6e}
-.stat-lbl{font-size:0.72rem;color:#888;margin-top:2px}
-
-/* NOTIF TOAST */
-.toast-wrap{position:fixed;top:68px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.toast{background:#fff;border:1px solid #a8dcc0;border-left:4px solid #1a7a4a;border-radius:8px;padding:0.6rem 0.9rem;font-size:0.83rem;color:#1a7a4a;box-shadow:0 2px 12px rgba(0,0,0,0.12);pointer-events:auto;animation:slideIn 0.2s ease;max-width:340px}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* NOTIF inline */
-.notif{padding:0.6rem 0.9rem;border-radius:8px;font-size:0.83rem;margin-bottom:0.75rem;display:flex;align-items:flex-start;gap:8px}
-.notif-ok{background:#e8f5ee;color:#1a7a4a;border:1px solid #a8dcc0}
-.notif-warn{background:#fef0e0;color:#c55a00;border:1px solid #f5c97a}
-.notif-info{background:#e8f0fb;color:#1a3a6e;border:1px solid #b0c8f0}
-
-/* TABS */
-.day-tabs{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
-.day-tab{padding:0.35rem 0.9rem;border:1px solid rgba(0,0,0,0.15);border-radius:20px;font-size:0.8rem;cursor:pointer;background:#fff;color:#444;transition:all 0.15s}
-.day-tab.active{background:#1a3a6e;color:#fff;border-color:#1a3a6e}
-
-/* CUSTOM DROPDOWN SOSTITUTO */
-.dd-wrap{position:relative;width:100%;min-width:180px}
-.dd-trigger{width:100%;border:1px solid rgba(0,0,0,0.15);border-radius:7px;padding:0.4rem 2rem 0.4rem 0.6rem;font-size:0.82rem;background:#fff;font-family:inherit;cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;transition:border-color 0.15s;box-sizing:border-box}
-.dd-trigger:hover{border-color:#1a56a0}
-.dd-trigger.disp-sel{background:#f0fdf4;border-color:#86efac;color:#15803d;font-weight:700}
-.dd-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#888;font-size:0.75rem;pointer-events:none;flex-shrink:0}
-.dd-menu{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1px solid rgba(0,0,0,0.15);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,0.13);z-index:500;max-height:280px;overflow-y:auto;display:none}
-.dd-menu.open{display:block}
-.dd-group-label{padding:0.28rem 0.7rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;background:#f8f8f8;border-top:1px solid #efefef}
-.dd-group-label.disp-lbl{background:#f0fdf4;color:#166534;border-color:#d1fae5}
-.dd-option{padding:0.38rem 0.75rem;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.1s}
-.dd-option:hover{background:#f0f4fb}
-.dd-option.selected{font-weight:600;background:#f0f4fb}
-.dd-option.disp-opt{background:#f6fff9;color:#15803d;font-weight:700}
-.dd-option.disp-opt:hover{background:#dcfce7}
-.dd-option.disp-opt.selected{background:#bbf7d0}
-.dd-none{padding:0.38rem 0.75rem;font-size:0.82rem;color:#999;cursor:pointer;border-bottom:1px solid #f0f0f0}
-.dd-none:hover{background:#f5f5f5}
-.dd-badge{display:inline-flex;align-items:center;gap:3px;background:#dcfce7;border:1px solid #86efac;border-radius:5px;padding:1px 6px;font-size:0.7rem;font-weight:700;color:#15803d;margin-top:3px;width:fit-content}
-
-.section-note{font-size:0.78rem;color:#666;margin-bottom:0.75rem;padding:0.6rem 0.9rem;background:#fafafa;border-radius:6px;border-left:3px solid #b0bec5;line-height:1.6}
-
-code{background:#f0f0f0;padding:1px 5px;border-radius:4px;font-size:0.85em;font-family:monospace}
-
-.docente-chip{display:inline-flex;align-items:center;gap:4px;background:#f0f4fb;border:1px solid #d0daf0;border-radius:12px;padding:2px 8px;font-size:0.75rem;margin:1px}
-
-/* PRINT */
-@media print{
-  .topbar,.toast-wrap,.btn,.modal-bg{display:none!important}
-  .main{padding:0}
-  .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Sostituzioni Docenti — Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /*  */
+        :root { --primary: #1a56a0; --dark: #102a4d; --bg: #f8fafc; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn:hover { opacity: 0.9; }
+        .status-online { color: #10b981; font-size: 0.8rem; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
 <body>
-<div id="app"></div>
+
+<div id="app">
+    <div style="display:flex; justify-content:center; align-items:center; height:100vh;">
+        <p>Caricamento sistema...</p>
+    </div>
+</div>
 
 <script>
-// =============================================
-// DATI E COSTANTI
-// =============================================
-const CLASSI_BETTI=['1lcs','2lcs','3lcs','4lcs','5lcs','1lds','2lds','3lds','4lds','5lds','1le','2le','3le','4le','5le'];
-const GIORNI=['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+// --- CONFIGURAZIONE SUPABASE ---
+// Sostituisci questi valori con quelli del tuo progetto Supabase
+const SUPABASE_URL = 'sb_publishable_QpKVh93RqZvgvL1IzY1Qrw_qGkOk2zj';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6cnlkdGJoeHF6bXllcmFrZHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjkxMjcsImV4cCI6MjA5NDM0NTEyN30.ERUG7DB20zbmv8hAX1CYsceOl94XcB7inOV9IihkOWw';
+const supabase = lib.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Mappa di normalizzazione: tutte le varianti possibili → indice 0-5
-const GIORNO_MAP={
-  'lunedi':0,'lunedì':0,'lun':0,'mon':0,'monday':0,
-  'martedi':1,'martedì':1,'mar':1,'tue':1,'tuesday':1,
-  'mercoledi':2,'mercoledì':2,'mer':2,'wed':2,'wednesday':2,
-  'giovedi':3,'giovedì':3,'gio':3,'thu':3,'thursday':3,
-  'venerdi':4,'venerdì':4,'ven':4,'fri':4,'friday':4,
-  'sabato':5,'sab':5,'sat':5,'saturday':5,
-  'domenica':6,'dom':6,'sun':6,'sunday':6
+let STATE = {
+    user: null,
+    view: 'home',
+    sostituzioni: []
 };
 
-// Normalizza un nome giorno → indice 0-6 (o -1 se non riconosciuto)
-function normalizzaGiorno(s){
-  if(!s)return -1;
-  // rimuove accenti, spazi, porta in lowercase
-  const k=s.trim().toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z]/g,'');
-  return GIORNO_MAP[k]??-1;
-}
-
-// Confronto giorno: restituisce true se i due nomi rappresentano lo stesso giorno
-function stessoGiorno(a,b){
-  const ia=normalizzaGiorno(a), ib=normalizzaGiorno(b);
-  if(ia===-1||ib===-1)return false;
-  return ia===ib;
-}
-
-function getSede(classe){
-  if(!classe||classe.trim()==='')return'de Vincenti';
-  return CLASSI_BETTI.includes(classe.toLowerCase().trim())?'Betti':'de Vincenti';
-}
-
-// Converte una data YYYY-MM-DD nel nome italiano canonico del giorno (da GIORNI[])
-function getDayName(ds){
-  if(!ds)return'';
-  const d=new Date(ds+'T12:00:00');
-  const n=d.getDay(); // 0=dom,1=lun,...,6=sab
-  const idx=n===0?6:n-1; // 0=lun,...,5=sab,6=dom
-  return GIORNI[idx]??'';
-}
-
-function formatDate(ds){
-  if(!ds)return'';
-  const d=new Date(ds+'T12:00:00');
-  return d.toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-}
-
-function todayStr(){
-  return new Date().toISOString().split('T')[0];
-}
-
-function parseCSV(text){
-  const lines=text.trim().split('\n');
-  const rows=[];
-  for(const line of lines){
-    if(!line.trim()||line.trim().startsWith('#'))continue;
-    // Gestione virgole in mezzo ai cognomi: split su virgola ma preserva groups
-    const parts=[];
-    let buf='',inQuote=false;
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(c==='"'){inQuote=!inQuote;}
-      else if(c===','&&!inQuote){parts.push(buf.trim());buf='';}
-      else buf+=c;
+// --- LOGICA DATI ---
+async function fetchSostituzioni() {
+    const { data, error } = await supabase
+        .from('sostituzioni')
+        .select('*')
+        .order('data', { ascending: false });
+    
+    if (error) console.error("Errore fetch:", error);
+    else {
+        STATE.sostituzioni = data;
+        render();
     }
-    parts.push(buf.trim());
-    if(parts.length<9)continue;
-    const [durata,mat_nome,...rest]=parts;
-    // Il campo cognome e nome possono contenere più valori separati da ;
-    const doc_cogn_raw=rest[0]||'';
-    const doc_nome_raw=rest[1]||'';
-    const classe=rest[2]||'';
-    const aula=rest[3]||'';
-    const giorno=rest[4]||'';
-    const oInizio=rest[5]||'';
-    const sedeCSV=rest[6]||'';
-    const docCogns=doc_cogn_raw.split(';').map(s=>s.trim()).filter(Boolean);
-    const docNomi=doc_nome_raw.split(';').map(s=>s.trim()).filter(Boolean);
-    const sede=getSede(classe)||(sedeCSV?sedeCSV:'de Vincenti');
-    // Normalizza il giorno alla forma canonica (es. "lunedi" → "Lunedì")
-    const giornoIdx=normalizzaGiorno(giorno);
-    const giornoCanon=giornoIdx>=0&&giornoIdx<6?GIORNI[giornoIdx]:giorno.trim();
-    rows.push({
-      durata:parseInt(durata)||60,
-      mat_nome:mat_nome.trim(),
-      doc_cogn:docCogns.length>0?docCogns:[doc_cogn_raw],
-      doc_nome:docNomi,
-      classe:classe.trim(),
-      aula:aula.trim(),
-      giorno:giornoCanon,
-      oInizio:oInizio.trim(),
-      sede
-    });
-  }
-  return rows;
 }
 
-const CSV_ESEMPIO=`# CSV Orario — formato: durata,mat_nome,doc_cogn,doc_nome,classe,aula,giorno,o.inizio,sede
-# Per più docenti stessa ora: separare con ; (punto e virgola)
-# Disposizione = docente disponibile per sostituzioni
-60,Matematica,Rossi,Marco,1A,Aula1,Lunedì,08:00,sede
-60,Italiano,Bianchi,Laura,1A,Aula1,Lunedì,09:00,sede
-60,Inglese,Ferrari,Giulia,2B,Aula2,Lunedì,08:00,sede
-120,Matematica,Rossi,Marco,2B,Aula2,Lunedì,09:00,sede
-60,Disposizione,Neri,Anna,,,Lunedì,10:00,sede
-60,Fisica,Russo,Carlo,1lcs,Aula3,Martedì,08:00,Betti
-60,Storia,Greco,Sofia,1lds,Aula4,Martedì,09:00,Betti
-60,Italiano,Bianchi;Conti,Laura;Paolo,1le,Aula5,Martedì,08:00,Betti
-60,Matematica,Rossi,Marco,3A,Aula1,Martedì,11:00,sede
-60,Disposizione,Neri,Anna,,,Martedì,10:00,sede
-60,Arte,Conti,Paolo,4B,Aula6,Mercoledì,08:00,sede
-60,Matematica,Russo,Carlo,5A,Aula1,Mercoledì,09:00,sede
-60,Filosofia,Ferrari,Giulia,4lcs,Aula7,Mercoledì,10:00,Betti`;
-
-// =============================================
-// STATO GLOBALE (persistito in localStorage)
-// =============================================
-function loadState(key,def){
-  try{const v=localStorage.getItem('sostituzioni_'+key);return v?JSON.parse(v):def;}
-  catch(e){return def;}
-}
-function saveState(key,val){
-  try{localStorage.setItem('sostituzioni_'+key,JSON.stringify(val));}
-  catch(e){}
+async function aggiungiSostituzione(payload) {
+    const { error } = await supabase
+        .from('sostituzioni')
+        .insert([payload]);
+    
+    if (error) alert("Errore nel salvataggio!");
+    else fetchSostituzioni();
 }
 
-let STATE={
-  users:loadState('users',[
-    {id:1,username:'admin',password:'admin123',nome:'Amministratore',cognome:'Sistema',ruolo:'admin',email:'admin@ettoreconti.edu.it'},
-    {id:2,username:'rossi',password:'docente1',nome:'Marco',cognome:'Rossi',ruolo:'docente',email:'m.rossi@ettoreconti.edu.it'},
-    {id:3,username:'bianchi',password:'docente2',nome:'Laura',cognome:'Bianchi',ruolo:'docente',email:'l.bianchi@ettoreconti.edu.it'},
-    {id:4,username:'ferrari',password:'docente3',nome:'Giulia',cognome:'Ferrari',ruolo:'docente',email:'g.ferrari@ettoreconti.edu.it'},
-    {id:5,username:'russo',password:'docente4',nome:'Carlo',cognome:'Russo',ruolo:'docente',email:'c.russo@ettoreconti.edu.it'},
-    {id:6,username:'neri',password:'docente5',nome:'Anna',cognome:'Neri',ruolo:'docente',email:'a.neri@ettoreconti.edu.it'},
-  ]),
-  orario:loadState('orario',[]),
-  assenze:loadState('assenze',[]),
-  sostituzioni:loadState('sostituzioni',[]),
-  emailLog:loadState('emailLog',[]),
-  currentUser:null,
-  page:'sostituzioni',
-  selDate:todayStr(),
-  toasts:[],
-  modal:null
-};
-
-function setState(updates){
-  Object.assign(STATE,typeof updates==='function'?updates(STATE):updates);
-  // persist
-  ['users','orario','assenze','sostituzioni','emailLog'].forEach(k=>{
-    if(k in (typeof updates==='function'?{}:updates)||typeof updates==='function'){
-      saveState(k,STATE[k]);
-    }
-  });
-  render();
-}
-
-// =============================================
-// LOGICA BUSINESS
-// =============================================
-function lezioniPerAssenza(assenza){
-  const giorno=getDayName(assenza.date);
-  return STATE.orario.filter(r=>{
-    if(!r.doc_cogn.includes(assenza.docCogn))return false;
-    if(assenza.tipo==='giorno')return stessoGiorno(r.giorno,giorno);
-    if(assenza.tipo==='ora')return stessoGiorno(r.giorno,giorno)&&r.oInizio===assenza.ora;
-    return false;
-  });
-}
-
-function isDisposizioneMateria(nome){
-  if(!nome)return false;
-  return nome.toLowerCase().replace(/\s+/g,'').includes('disposizione');
-}
-
-function docentiDisponibili(lezione,selDate){
-  const giorno=getDayName(selDate);
-
-  // Tutti i docenti che hanno "Disposizione" come materia in quel giorno e a quell'ora
-  const docInDisposizione=new Set(
-    STATE.orario
-      .filter(r=>stessoGiorno(r.giorno,giorno)&&isDisposizioneMateria(r.mat_nome)&&r.oInizio===lezione.oInizio)
-      .flatMap(r=>r.doc_cogn)
-  );
-
-  // Docenti occupati in quell'ora (esclusi quelli in disposizione — quelli sono disponibili per definizione)
-  const orarioBusy=STATE.orario.filter(r=>
-    stessoGiorno(r.giorno,giorno)&&
-    r.oInizio===lezione.oInizio&&
-    !isDisposizioneMateria(r.mat_nome)   // le righe "disposizione" NON rendono il docente occupato
-  );
-  const docentiOccupati=new Set(orarioBusy.flatMap(r=>r.doc_cogn));
-
-  // Aggiungi assenti come occupati
-  STATE.assenze.filter(a=>{
-    if(a.date!==selDate)return false;
-    if(a.tipo==='giorno')return true;
-    return a.tipo==='ora'&&a.ora===lezione.oInizio;
-  }).forEach(a=>docentiOccupati.add(a.docCogn));
-
-  // Il docente assente stesso è ovviamente occupato
-  lezione.doc_cogn.forEach(d=>docentiOccupati.add(d));
-
-  // I docenti in disposizione assenti o già occupati vanno rimossi
-  docentiOccupati.forEach(d=>docInDisposizione.delete(d));
-
-  const disposizioni=[...docInDisposizione];
-
-  // Tutti gli altri set escludono già i docenti in disposizione (già gestiti sopra)
-  const tutti=new Set([...docentiOccupati,...docInDisposizione]);
-  const filter=arr=>[...new Set(arr)].filter(c=>!tutti.has(c));
-
-  // PRIORITÀ 2 — Stesso docente della classe
-  const stesseClassi=filter(
-    STATE.orario.filter(r=>stessoGiorno(r.giorno,giorno)&&r.classe===lezione.classe&&!isDisposizioneMateria(r.mat_nome)&&!r.doc_cogn.every(d=>lezione.doc_cogn.includes(d)))
-      .flatMap(r=>r.doc_cogn)
-  );
-
-  // PRIORITÀ 3 — Stessa materia
-  const stessaMat=filter(
-    STATE.orario.filter(r=>stessoGiorno(r.giorno,giorno)&&r.mat_nome===lezione.mat_nome&&r.oInizio!==lezione.oInizio&&!isDisposizioneMateria(r.mat_nome))
-      .flatMap(r=>r.doc_cogn)
-  );
-
-  // PRIORITÀ 4 — Altri docenti conosciuti nell'orario, liberi in quell'ora
-  const tuttiDocenti=[...new Set(STATE.orario.filter(r=>!isDisposizioneMateria(r.mat_nome)).flatMap(r=>r.doc_cogn))];
-  const liberi=filter(tuttiDocenti);
-
-  return{disposizioni,stesseClassi,stessaMat,liberi};
-}
-
-function addToast(msg){
-  const id=Date.now()+Math.random();
-  STATE.toasts=[...STATE.toasts,{id,msg}];
-  render();
-  setTimeout(()=>{STATE.toasts=STATE.toasts.filter(t=>t.id!==id);render();},4000);
-}
-
-function simulaEmail(a,tipo,extra){
-  const doc=STATE.users.find(u=>u.cognome===a.docCogn);
-  const email=doc?doc.email:`${a.docCogn.toLowerCase()}@scuola.edu`;
-  let msg='';
-  if(tipo==='assenza'){
-    msg=`[${new Date().toLocaleString('it-IT')}] → ${email} | Oggetto: Conferma assenza ${formatDate(a.date)} | ${a.tipo==='giorno'?'Assenza intera giornata':'Permesso ora '+a.ora}`;
-  } else if(tipo==='sostituzione'){
-    const docSost=STATE.users.find(u=>u.cognome===extra.sostituto);
-    const emailSost=docSost?docSost.email:`${extra.sostituto.toLowerCase()}@scuola.edu`;
-    msg=`[${new Date().toLocaleString('it-IT')}] → ${emailSost} | Oggetto: Sostituzione assegnata | Sostituire ${a.docCogn} il ${formatDate(a.date)} ore ${extra.ora} — ${extra.classe} (${extra.sede})`;
-  }
-  if(msg){
-    STATE.emailLog=[msg,...STATE.emailLog];
-    saveState('emailLog',STATE.emailLog);
-  }
-  return email;
-}
-
-// =============================================
-// RENDER ENGINE (vanilla JS)
-// =============================================
-function el(tag,attrs,children){
-  const e=document.createElement(tag);
-  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
-    if(k==='class')e.className=v;
-    else if(k==='style'&&typeof v==='object')Object.assign(e.style,v);
-    else if(k.startsWith('on'))e.addEventListener(k.slice(2).toLowerCase(),v);
-    else if(k==='html')e.innerHTML=v;
-    else e.setAttribute(k,v);
-  });
-  if(children)flatten(children).forEach(c=>{
-    if(c==null||c===false)return;
-    e.appendChild(typeof c==='string'?document.createTextNode(c):c);
-  });
-  return e;
-}
-function flatten(a){return Array.isArray(a)?a.flatMap(flatten):[a];}
-function text(t){return document.createTextNode(String(t??''));}
-function frag(...children){const f=document.createDocumentFragment();flatten(children).forEach(c=>{if(c!=null&&c!==false)f.appendChild(typeof c==='string'?document.createTextNode(c):c);});return f;}
-
-function render(){
-  const root=document.getElementById('app');
-  root.innerHTML='';
-  root.appendChild(renderApp());
-}
-
-function renderApp(){
-  const s=STATE;
-  if(!s.currentUser)return renderLogin();
-  const isAdmin=s.currentUser.ruolo==='admin';
-  return frag(
-    renderTopbar(),
-    renderToasts(),
-    el('div',{class:'main'},[
-      s.page==='dashboard'&&isAdmin?renderDashboard():null,
-      s.page==='assenze'&&isAdmin?renderAssenze():null,
-      s.page==='sostituzioni'?renderSostituzioni():null,
-      s.page==='orario'&&isAdmin?renderOrario():null,
-      s.page==='utenti'&&isAdmin?renderUtenti():null,
-      s.page==='email'&&isAdmin?renderEmail():null,
-      s.modal?renderModal():null
-    ])
-  );
-}
-
-// =============================================
-// LOGIN
-// =============================================
-function renderLogin(){
-  const card=el('div',{class:'login-card'});
-  card.appendChild(el('div',{class:'login-logo'},[
-    el('div',{class:'icon-wrap'},['🏫']),
-    el('div',{class:'school-name'},['Gestione Sostituzioni']),
-    el('div',{class:'subtitle'},['Istituto Scolastico — Betti / de Vincenti'])
-  ]));
-
-  const errDiv=el('div',{class:'err-msg hidden',id:'login-err'});
-  card.appendChild(errDiv);
-
-  const inpU=el('input',{type:'text',id:'login-u',placeholder:'es. admin'});
-  const inpP=el('input',{type:'password',id:'login-p',placeholder:'password'});
-
-  card.appendChild(el('div',{class:'form-group'},[el('label',{},'Username'),inpU]));
-  card.appendChild(el('div',{class:'form-group'},[el('label',{},'Password'),inpP]));
-
-  function doLogin(){
-    const u=inpU.value.trim(),p=inpP.value;
-    const found=STATE.users.find(x=>x.username===u&&x.password===p);
-    if(found){
-      setState({currentUser:found,page:found.ruolo==='admin'?'dashboard':'sostituzioni'});
-    } else {
-      errDiv.textContent='⚠️ Credenziali non valide';
-      errDiv.className='err-msg';
-    }
-  }
-  inpU.addEventListener('keydown',e=>e.key==='Enter'&&doLogin());
-  inpP.addEventListener('keydown',e=>e.key==='Enter'&&doLogin());
-
-  card.appendChild(el('button',{class:'btn btn-primary btn-full',onclick:doLogin},'Accedi'));
-  card.appendChild(el('div',{class:'info-box'},[
-    el('strong',{},'Credenziali demo:'),el('br',{}),'admin / admin123',
-    el('br',{}),'rossi / docente1 &nbsp; bianchi / docente2',
-    el('br',{}),'ferrari / docente3 &nbsp; russo / docente4',
-    el('br',{}),el('br',{}),'💾 I dati vengono salvati nel browser (localStorage)'
-  ]));
-
-  return el('div',{class:'login-wrap'},[card]);
-}
-
-// =============================================
-// TOPBAR
-// =============================================
-function renderTopbar(){
-  const s=STATE;
-  const isAdmin=s.currentUser.ruolo==='admin';
-  const navItems=isAdmin?[
-    ['dashboard','📊 Dashboard'],['assenze','📋 Assenze'],['sostituzioni','🔄 Sostituzioni'],
-    ['orario','📅 Orario'],['utenti','👥 Utenti'],['email','📧 Email Log']
-  ]:[['sostituzioni','🔄 Sostituzioni']];
-
-  const nav=el('nav',{},[
-    ...navItems.map(([pg,lbl])=>el('button',{
-      class:'nav-btn'+(s.page===pg?' active':''),
-      onclick:()=>setState({page:pg})
-    },lbl))
-  ]);
-
-  return el('div',{class:'topbar'},[
-    el('div',{class:'logo'},['🏫 Sostituzioni ',el('span',{},'Betti / de Vincenti')]),
-    nav,
-    el('div',{class:'topbar-right'},[
-      '👤 '+s.currentUser.nome+' '+s.currentUser.cognome,
-      el('span',{class:'badge-ruolo badge-'+(isAdmin?'admin':'docente')},isAdmin?'Admin':'Docente'),
-      el('button',{class:'btn btn-outline btn-sm',onclick:()=>setState({currentUser:null,page:'sostituzioni'})},'Esci')
-    ])
-  ]);
-}
-
-// =============================================
-// TOASTS
-// =============================================
-function renderToasts(){
-  return el('div',{class:'toast-wrap'},
-    STATE.toasts.map(t=>el('div',{class:'toast'},t.msg))
-  );
-}
-
-// =============================================
-// DATE NAV
-// =============================================
-function renderDateNav(){
-  const s=STATE;
-  function changeDate(n){
-    const d=new Date(s.selDate+'T12:00:00');d.setDate(d.getDate()+n);
-    setState({selDate:d.toISOString().split('T')[0]});
-  }
-  const inp=el('input',{type:'date',value:s.selDate,style:{border:'1px solid rgba(0,0,0,0.15)',borderRadius:'6px',padding:'4px 8px',fontSize:'0.82rem',fontFamily:'inherit'}});
-  inp.addEventListener('change',e=>setState({selDate:e.target.value}));
-
-  return el('div',{class:'date-nav'},[
-    el('button',{class:'arrow-btn',onclick:()=>changeDate(-1)},'◀'),
-    el('span',{class:'cur-date'},formatDate(s.selDate)),
-    el('button',{class:'arrow-btn',onclick:()=>changeDate(1)},'▶'),
-    el('button',{class:'btn btn-outline btn-sm',onclick:()=>setState({selDate:todayStr()})},'Oggi'),
-    inp
-  ]);
-}
-
-// =============================================
-// DASHBOARD
-// =============================================
-function renderDashboard(){
-  const {orario,assenze,sostituzioni}=STATE;
-  const oggiStr=todayStr();
-  const assenzeOggi=assenze.filter(a=>a.date===oggiStr).length;
-
-  const stats=el('div',{class:'grid3'},[
-    statCard(orario.length,'Righe orario'),
-    statCard(assenzeOggi,'Assenze oggi'),
-    statCard(assenze.length,'Assenze totali'),
-    statCard(sostituzioni.length,'Sostituzioni assegnate'),
-  ]);
-
-  const prossime=assenze.filter(a=>a.date>=oggiStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,6);
-  const listAssenze=el('div',{},[
-    prossime.length===0?el('p',{style:{color:'#999',fontSize:'0.85rem'}},'Nessuna assenza inserita'):null,
-    ...prossime.map(a=>assenzaRow(a,false))
-  ]);
-
-  const cardAssenze=el('div',{class:'card'},[
-    el('div',{class:'card-title'},'📅 Prossime assenze'),
-    listAssenze,
-    el('button',{class:'btn btn-outline btn-sm',style:{marginTop:'0.75rem'},onclick:()=>setState({page:'assenze'})},'Gestisci assenze →')
-  ]);
-
-  const cardSedi=el('div',{class:'card'},[
-    el('div',{class:'card-title'},'🏫 Sedi scolastiche'),
-    el('div',{style:{marginBottom:'0.75rem'}},[
-      el('div',{style:{fontWeight:600,marginBottom:'4px'}},'📍 Sede Betti'),
-      el('div',{style:{fontSize:'0.78rem',color:'#666'}},'Classi: 1-5 LCS, 1-5 LDS, 1-5 LE')
-    ]),
-    el('div',{},[
-      el('div',{style:{fontWeight:600,marginBottom:'4px'}},'📍 Sede de Vincenti'),
-      el('div',{style:{fontSize:'0.78rem',color:'#666'}},'Tutte le altre classi')
-    ]),
-    el('div',{class:'notif notif-info',style:{marginTop:'1rem',marginBottom:0}},'💡 Il sistema determina automaticamente la sede dalla classe')
-  ]);
-
-  return frag(
-    el('div',{class:'page-title'},'📊 Dashboard'),
-    stats,
-    el('div',{class:'grid2'},[cardAssenze,cardSedi])
-  );
-}
-
-function statCard(val,lbl){
-  return el('div',{class:'stat-card'},[
-    el('div',{class:'stat-val'},String(val)),
-    el('div',{class:'stat-lbl'},lbl)
-  ]);
-}
-
-function assenzaRow(a,showDelete){
-  const tipo=a.tipo==='giorno';
-  const row=el('div',{class:'assenza-row'},[
-    el('div',{style:{width:'36px',height:'36px',borderRadius:'50%',background:'#f0f4fb',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',flexShrink:0}},'👤'),
-    el('div',{class:'assenza-info'},[
-      el('div',{class:'assenza-nome'},'Prof. '+a.docCogn+(a.docNome?' '+a.docNome:'')),
-      el('div',{class:'assenza-det'},formatDate(a.date)+' — '+(tipo?'Tutto il giorno':'Permesso ora '+a.ora))
-    ]),
-    el('span',{class:'pill '+(tipo?'pill-red':'pill-orange')},tipo?'Tutto giorno':'Permesso')
-  ]);
-  if(showDelete){
-    const btn=el('button',{class:'btn btn-danger btn-sm'},'🗑 Elimina');
-    btn.addEventListener('click',()=>{
-      if(!confirm('Eliminare questa assenza?'))return;
-      STATE.assenze=STATE.assenze.filter(x=>x.id!==a.id);
-      STATE.sostituzioni=STATE.sostituzioni.filter(x=>x.assenzaId!==a.id);
-      saveState('assenze',STATE.assenze);
-      saveState('sostituzioni',STATE.sostituzioni);
-      addToast('✅ Assenza eliminata');
-      render();
-    });
-    row.appendChild(btn);
-  }
-  return row;
-}
-
-// =============================================
-// ASSENZE
-// =============================================
-function renderAssenze(){
-  const s=STATE;
-  const assenzeGiorno=s.assenze.filter(a=>a.date===s.selDate).sort((a,b)=>a.docCogn.localeCompare(b.docCogn));
-  const docentiOrario=[...new Set(s.orario.flatMap(r=>r.doc_cogn))].sort();
-  const docentiUsers=s.users.filter(u=>u.ruolo==='docente').map(u=>u.cognome);
-  const tuttiDocenti=[...new Set([...docentiOrario,...docentiUsers])].sort();
-
-  const btnNuova=el('button',{class:'btn btn-primary btn-sm',onclick:()=>apriFinestraAssenza(null)},'+ Nuova assenza');
-
-  const headerCard=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}},[
-    el('div',{class:'card-title',style:{marginBottom:0}},'Assenze del '+formatDate(s.selDate)),
-    btnNuova
-  ]);
-
-  const listaGiorno=el('div',{},[
-    assenzeGiorno.length===0?el('p',{style:{color:'#999',fontSize:'0.85rem',padding:'0.5rem 0'}},'Nessuna assenza registrata per questo giorno'):null,
-    ...assenzeGiorno.map(a=>assenzaRow(a,true))
-  ]);
-
-  // tabella tutte le assenze
-  const tutteRows=s.assenze.slice().sort((a,b)=>a.date.localeCompare(b.date));
-  const tbody=el('tbody',{},[
-    tutteRows.length===0?el('tr',{},[el('td',{colspan:'5',style:{color:'#999',padding:'1rem',textAlign:'center'}},'Nessuna assenza inserita')]):null,
-    ...tutteRows.map(a=>{
-      const tipo=a.tipo==='giorno';
-      const delBtn=el('button',{class:'btn btn-danger btn-sm'},'🗑');
-      delBtn.addEventListener('click',()=>{
-        if(!confirm('Eliminare?'))return;
-        STATE.assenze=STATE.assenze.filter(x=>x.id!==a.id);
-        STATE.sostituzioni=STATE.sostituzioni.filter(x=>x.assenzaId!==a.id);
-        saveState('assenze',STATE.assenze);saveState('sostituzioni',STATE.sostituzioni);
-        addToast('✅ Assenza eliminata');render();
-      });
-      const tr=el('tr',{},[
-        el('td',{},formatDate(a.date)),
-        el('td',{},[el('strong',{},'Prof. '+a.docCogn),(a.docNome?' '+a.docNome:'')]),
-        el('td',{},[el('span',{class:'pill '+(tipo?'pill-red':'pill-orange')},tipo?'Tutto giorno':'Permesso orario')]),
-        el('td',{},tipo?'—':a.ora),
-        el('td',{},[delBtn])
-      ]);
-      return tr;
-    })
-  ]);
-
-  const tabella=el('div',{class:'card'},[
-    el('div',{class:'card-title'},'📅 Tutte le assenze inserite (anno scolastico)'),
-    el('div',{class:'tbl-wrap'},[
-      el('table',{},[
-        el('thead',{},[el('tr',{},[el('th',{},'Data'),el('th',{},'Docente'),el('th',{},'Tipo'),el('th',{},'Ora'),el('th',{},'Azione')])]),
-        tbody
-      ])
-    ])
-  ]);
-
-  return frag(
-    el('div',{class:'page-title'},'📋 Gestione Assenze'),
-    renderDateNav(),
-    el('div',{class:'card'},[headerCard,listaGiorno]),
-    tabella
-  );
-}
-
-function apriFinestraAssenza(data){
-  // Mostra un modal per inserire/modificare assenza
-  const docentiOrario=[...new Set(STATE.orario.flatMap(r=>r.doc_cogn))].sort();
-  const docentiUsers=STATE.users.filter(u=>u.ruolo==='docente').map(u=>u.cognome);
-  const tuttiDocenti=[...new Set([...docentiOrario,...docentiUsers])].sort();
-  const selDate=STATE.selDate;
-
-  let tipo='giorno';
-  let selectedDoc='';
-  let selectedOra='';
-  let selectedDate=selDate;
-
-  const errDiv=el('div',{class:'err-msg hidden'});
-
-  const selDocente=el('select',{class:''});
-  selDocente.appendChild(el('option',{value:''},'— Seleziona docente —'));
-  tuttiDocenti.forEach(d=>{const o=el('option',{value:d},d);selDocente.appendChild(o);});
-  selDocente.addEventListener('change',e=>{selectedDoc=e.target.value;});
-
-  const selData=el('input',{type:'date',value:selDate});
-  selData.addEventListener('change',e=>{selectedDate=e.target.value;aggiornareOre();});
-
-  const selTipo=el('select',{});
-  [['giorno','Tutto il giorno'],['ora','Permesso orario']].forEach(([v,l])=>{const o=el('option',{value:v},l);selTipo.appendChild(o);});
-  
-  const wrapOra=el('div',{class:'form-group'});
-  const selOra=el('select',{});
-  selOra.addEventListener('change',e=>{selectedOra=e.target.value;});
-
-  function aggiornareOre(){
-    selOra.innerHTML='';
-    const giorno=getDayName(selectedDate);
-    const ore=[...new Set(STATE.orario.filter(r=>r.giorno===giorno).map(r=>r.oInizio))].sort();
-    if(ore.length===0){
-      ['08:00','09:00','10:00','11:00','12:00','13:00'].forEach(o=>{selOra.appendChild(el('option',{value:o},o));});
-    } else {
-      ore.forEach(o=>{selOra.appendChild(el('option',{value:o},o));});
-    }
-    selectedOra=selOra.value;
-  }
-  aggiornareOre();
-
-  selTipo.addEventListener('change',e=>{
-    tipo=e.target.value;
-    wrapOra.style.display=tipo==='ora'?'block':'none';
-  });
-
-  wrapOra.style.display='none';
-  wrapOra.appendChild(el('label',{},'Ora interessata'));
-  wrapOra.appendChild(selOra);
-
-  function submit(){
-    if(!selectedDoc){errDiv.textContent='Seleziona un docente';errDiv.className='err-msg';return;}
-    if(tipo==='ora'&&!selectedOra){errDiv.textContent='Seleziona l\'ora';errDiv.className='err-msg';return;}
-    const docObj=STATE.users.find(u=>u.cognome===selectedDoc);
-    const nuova={id:Date.now(),docCogn:selectedDoc,docNome:docObj?docObj.nome:'',tipo,ora:tipo==='ora'?selectedOra:'',date:selectedDate};
-    STATE.assenze=[...STATE.assenze,nuova];
-    saveState('assenze',STATE.assenze);
-    const email=simulaEmail(nuova,'assenza');
-    addToast('✅ Assenza inserita — 📧 email inviata a '+email);
-    setState({modal:null,selDate:selectedDate});
-  }
-
-  const formWrap=el('div',{},[
-    errDiv,
-    el('div',{class:'form-group'},[el('label',{},'Data assenza'),selData]),
-    el('div',{class:'form-group'},[el('label',{},'Docente assente'),selDocente]),
-    el('div',{class:'form-group'},[el('label',{},'Tipo assenza'),selTipo]),
-    wrapOra
-  ]);
-
-  // Aggiungere wrapper .form-group
-  wrapOra.className='form-group';
-
-  setState({modal:{
-    title:'➕ Inserisci Nuova Assenza',
-    body:formWrap,
-    actions:[
-      {label:'Annulla',cls:'btn btn-outline',cb:()=>setState({modal:null})},
-      {label:'Salva assenza',cls:'btn btn-primary',cb:submit}
-    ]
-  }});
-}
-
-// =============================================
-// SOSTITUZIONI
-// =============================================
-function renderSostituzioni(){
-  const s=STATE;
-  const isAdmin=s.currentUser.ruolo==='admin';
-  const assenzeGiorno=s.assenze.filter(a=>a.date===s.selDate);
-  const giornoCalc=getDayName(s.selDate);
-  const giorniNelOrario=[...new Set(STATE.orario.map(r=>r.giorno))];
-  const lezioniGiorno=STATE.orario.filter(r=>stessoGiorno(r.giorno,giornoCalc)).length;
-
-  const header=el('div',{class:'page-title'},'🔄 Sostituzioni — '+formatDate(s.selDate));
-  const dateNav=isAdmin?renderDateNav():null;
-
-  // Barra di diagnostica (sempre visibile se c'è un orario caricato)
-  const debugBar=STATE.orario.length>0?el('div',{class:'notif notif-info',style:{marginBottom:'0.75rem',fontSize:'0.79rem',gap:'6px',flexWrap:'wrap'}},[
-    '🗓 Giorno: ',el('strong',{},giornoCalc),
-    el('span',{style:{margin:'0 6px',color:'#aaa'}},'|'),
-    'Giorni in orario: ',el('strong',{},giorniNelOrario.join(', ')||'—'),
-    el('span',{style:{margin:'0 6px',color:'#aaa'}},'|'),
-    'Lezioni di oggi nell\'orario: ',el('strong',{},String(lezioniGiorno))
-  ]):null;
-
-  const note=!isAdmin?el('div',{class:'section-note'},'ℹ️ Visualizzazione sola lettura. Le sostituzioni assegnate per il giorno selezionato sono elencate di seguito.'):null;
-
-  const cards=assenzeGiorno.length===0?
-    [el('div',{class:'card'},[el('p',{style:{color:'#999',fontSize:'0.9rem'}},'✅ Nessuna assenza registrata per '+formatDate(s.selDate))])]:
-    assenzeGiorno.map(a=>renderCardAssenza(a,isAdmin));
-
-  let mySubstituzioni=null;
-  if(!isAdmin){
-    const mie=s.sostituzioni.filter(sub=>{
-      const a=s.assenze.find(x=>x.id===sub.assenzaId&&x.date===s.selDate);
-      return a&&sub.docCognSostituto===s.currentUser.cognome;
-    });
-    const righe=mie.map(sub=>{
-      const a=s.assenze.find(x=>x.id===sub.assenzaId);
-      if(!a)return null;
-      const lezioni=lezioniPerAssenza(a);
-      const idx=parseInt((sub.lessonKey||'').split('_')[1])||0;
-      const l=lezioni[idx];
-      if(!l)return null;
-      return el('div',{class:'assenza-row'},[
-        el('div',{class:'assenza-info'},[
-          el('div',{class:'assenza-nome'},l.oInizio+' — '+l.mat_nome+' in '+l.classe+(l.aula?' ('+l.aula+')':'')),
-          el('div',{class:'assenza-det'},'Sostituisci Prof. '+a.docCogn+' — ',el('span',{class:'sede-'+(l.sede==='Betti'?'betti':'devincenti')},l.sede))
-        ]),
-        el('span',{class:'pill pill-green'},'✓ Confermata')
-      ]);
-    }).filter(Boolean);
-
-    mySubstituzioni=el('div',{class:'card'},[
-      el('div',{class:'card-title'},'📌 Le mie sostituzioni'),
-      righe.length===0?el('p',{style:{color:'#999',fontSize:'0.85rem'}},'Nessuna sostituzione assegnata a te'):frag(...righe)
-    ]);
-  }
-
-  const f=frag(header);
-  if(dateNav)f.appendChild(dateNav);
-  if(debugBar)f.appendChild(debugBar);
-  if(note)f.appendChild(note);
-  cards.forEach(c=>f.appendChild(c));
-  if(mySubstituzioni)f.appendChild(mySubstituzioni);
-  return f;
-}
-
-function renderCardAssenza(a,isAdmin){
-  const lezioni=lezioniPerAssenza(a);
-  const tipo=a.tipo==='giorno';
-
-  const thead=el('thead',{},[el('tr',{},[
-    el('th',{},'Ora'),el('th',{},'Durata'),el('th',{},'Materia'),
-    el('th',{},'Docente/i'),el('th',{},'Classe'),el('th',{},'Aula'),
-    el('th',{},'Sede'),el('th',{style:{minWidth:'200px'}},'Sostituto assegnato')
-  ])]);
-
-  const tbody=el('tbody',{});
-  if(lezioni.length===0){
-    tbody.appendChild(el('tr',{},[el('td',{colspan:'8',style:{color:'#aaa',fontSize:'0.83rem',padding:'0.75rem'}},'Nessuna lezione trovata nell\'orario per questo giorno')]));
-  } else {
-    lezioni.forEach((l,i)=>{
-      const key=a.id+'_'+i;
-      const sost=STATE.sostituzioni.find(s=>s.assenzaId===a.id&&s.lessonKey===key);
-      const isDispRow=sost&&sost.isDisposizione;
-      const tr=el('tr',{style:isDispRow?{background:'#f0fdf4'}:{}},[
-        el('td',{},[el('strong',{},l.oInizio)]),
-        el('td',{},l.durata+'min'),
-        el('td',{},l.mat_nome.toLowerCase().includes('disposizione')?el('span',{class:'pill pill-purple'},'Disposizione'):l.mat_nome),
-        el('td',{},[...l.doc_cogn.map(d=>el('span',{class:'docente-chip'},d))]),
-        el('td',{},l.classe||'—'),
-        el('td',{},l.aula||'—'),
-        el('td',{},[el('span',{class:'sede-'+(l.sede==='Betti'?'betti':'devincenti')},l.sede)]),
-        el('td',{},isAdmin?renderSelectSostituto(a,l,i,key,sost):
-          (sost
-            ? frag(
-                el('strong',{},sost.docCognSostituto),' ',
-                sost.isDisposizione
-                  ? el('span',{style:{background:'#dcfce7',border:'1px solid #86efac',borderRadius:'6px',padding:'2px 7px',fontSize:'0.72rem',fontWeight:700,color:'#15803d'}},'⭐ Disposizione')
-                  : el('span',{class:'pill pill-green'},'✓ Assegnato')
-              )
-            : el('span',{class:'pill pill-gray'},'Non assegnato')
-          )
-        )
-      ]);
-      tbody.appendChild(tr);
-    });
-  }
-
-  return el('div',{class:'card'},[
-    el('div',{class:'card-title'},[
-      '👤 Prof. '+a.docCogn+(a.docNome?' '+a.docNome:'')+' ',
-      el('span',{class:'pill '+(tipo?'pill-red':'pill-orange')},tipo?'Assente tutto il giorno':'Permesso ora '+a.ora)
-    ]),
-    el('div',{class:'tbl-wrap'},[el('table',{},[thead,tbody])])
-  ]);
-}
-
-// Un solo listener globale per chiudere i dropdown — registrato una volta sola
-if(!window._ddListenerAdded){
-  window._ddListenerAdded=true;
-  document.addEventListener('click',function(e){
-    if(!e.target.closest('.dd-wrap')){
-      document.querySelectorAll('.dd-menu.open').forEach(m=>m.classList.remove('open'));
-    }
-  });
-}
-
-function renderSelectSostituto(assenza,lezione,idx,key,sost){
-  const disp=docentiDisponibili(lezione,STATE.selDate);
-  const valCorrente=sost?sost.docCognSostituto:'';
-
-  const wrap=el('div',{class:'dd-wrap'});
-
-  function isDispVal(v){return v&&disp.disposizioni.includes(v);}
-
-  function labelFor(v){
-    if(!v)return'— Nessuno assegnato —';
-    return isDispVal(v)?'⭐ '+v+' (a disposizione)':v;
-  }
-
-  // Trigger
-  const triggerLabel=el('span',{class:'dd-label'},labelFor(valCorrente));
-  const trigger=el('button',{class:'dd-trigger'+(isDispVal(valCorrente)?' disp-sel':''),type:'button'},[
-    triggerLabel,
-    el('span',{class:'dd-arrow'},'▾')
-  ]);
-
-  // Menu
-  const menu=el('div',{class:'dd-menu'});
-
-  // Badge disposizione
-  const badge=el('div',{class:'dd-badge',style:{display:isDispVal(valCorrente)?'flex':'none'}},'⭐ A disposizione');
-
-  trigger.addEventListener('click',function(e){
-    e.stopPropagation();
-    // chiudi tutti gli altri
-    document.querySelectorAll('.dd-menu.open').forEach(m=>{if(m!==menu)m.classList.remove('open');});
-    menu.classList.toggle('open');
-  });
-
-  function buildMenu(curVal){
-    menu.innerHTML='';
-    // Voce nessuno
-    const noneOpt=el('div',{class:'dd-none'+(curVal===''?' selected':'')},'— Nessuno assegnato —');
-    noneOpt.addEventListener('click',function(e){e.stopPropagation();applyVal('');});
-    menu.appendChild(noneOpt);
-
-    const gruppi=[
-      {label:'⭐ A disposizione — priorità massima',docs:disp.disposizioni,isDisp:true},
-      {label:'🟢 Stesso docente in classe',docs:disp.stesseClassi,isDisp:false},
-      {label:'🟡 Stessa materia',docs:disp.stessaMat,isDisp:false},
-      {label:'⚪ Altri disponibili',docs:disp.liberi,isDisp:false},
-    ];
-    gruppi.forEach(function(g){
-      if(!g.docs||g.docs.length===0)return;
-      menu.appendChild(el('div',{class:'dd-group-label'+(g.isDisp?' disp-lbl':'')},g.label));
-      g.docs.forEach(function(d){
-        const isSel=d===curVal;
-        const item=el('div',{class:'dd-option'+(g.isDisp?' disp-opt':'')+(isSel?' selected':'')});
-        if(g.isDisp)item.appendChild(document.createTextNode('⭐ '));
-        item.appendChild(el('span',{},d));
-        if(isSel)item.appendChild(el('span',{style:{marginLeft:'auto',fontSize:'0.72rem'}},'✓'));
-        item.addEventListener('click',function(e){e.stopPropagation();applyVal(d);});
-        menu.appendChild(item);
-      });
-    });
-  }
-
-  function applyVal(val){
-    menu.classList.remove('open');
-    const isD=isDispVal(val);
-    // aggiorna visivo
-    triggerLabel.textContent=labelFor(val);
-    trigger.className='dd-trigger'+(isD?' disp-sel':'');
-    badge.style.display=isD?'flex':'none';
-    buildMenu(val);
-    // salva
-    STATE.sostituzioni=STATE.sostituzioni.filter(function(s){return!(s.assenzaId===assenza.id&&s.lessonKey===key);});
-    if(val){
-      STATE.sostituzioni.push({assenzaId:assenza.id,lessonKey:key,docCognSostituto:val,isDisposizione:isD});
-      simulaEmail(assenza,'sostituzione',{sostituto:val,ora:lezione.oInizio,classe:lezione.classe,sede:lezione.sede});
-      addToast((isD?'⭐ A disposizione assegnato':'✅ Sostituzione assegnata')+' — Prof. '+val);
-    } else {
-      addToast('ℹ️ Sostituzione rimossa');
-    }
-    saveState('sostituzioni',STATE.sostituzioni);
-  }
-
-  buildMenu(valCorrente);
-  wrap.appendChild(trigger);
-  wrap.appendChild(menu);
-  wrap.appendChild(badge);
-  return wrap;
-}
-
-// =============================================
-// ORARIO
-// =============================================
-function renderOrario(){
-  const s=STATE;
-  const tabs=['visualizza','importa','elimina'];
-  const tabLabels=['📋 Visualizza','📥 Importa CSV','🗑 Elimina'];
-  const [activeTab,setActiveTab]=[s._orarioTab||'visualizza',t=>setState({_orarioTab:t})];
-
-  const tabEls=tabs.map((t,i)=>el('button',{
-    class:'day-tab'+(activeTab===t?' active':''),
-    onclick:()=>setActiveTab(t)
-  },tabLabels[i]));
-
-  let content;
-  if(activeTab==='visualizza'){
-    // Filtro giorno
-    const filterGiornoSel=el('select',{style:{border:'1px solid rgba(0,0,0,0.15)',borderRadius:'6px',padding:'4px 8px',fontSize:'0.85rem',fontFamily:'inherit'}});
-    filterGiornoSel.appendChild(el('option',{value:''},'Tutti i giorni'));
-    GIORNI.forEach(g=>{filterGiornoSel.appendChild(el('option',{value:g},g));});
-    filterGiornoSel.value=s._orarioFiltro||'';
-    filterGiornoSel.addEventListener('change',function(e){setState({_orarioFiltro:e.target.value,_orarioFiltroOra:''});});
-
-    // Filtro ora — dipende dal giorno selezionato
-    const filtroGiorno=s._orarioFiltro||'';
-    const oreDisponibili=[...new Set(
-      (filtroGiorno
-        ? s.orario.filter(r=>r.giorno===filtroGiorno)
-        : s.orario
-      ).map(r=>r.oInizio)
-    )].sort();
-
-    const filterOraSel=el('select',{style:{border:'1px solid rgba(0,0,0,0.15)',borderRadius:'6px',padding:'4px 8px',fontSize:'0.85rem',fontFamily:'inherit'}});
-    filterOraSel.appendChild(el('option',{value:''},'Tutte le ore'));
-    oreDisponibili.forEach(o=>{filterOraSel.appendChild(el('option',{value:o},o));});
-    filterOraSel.value=s._orarioFiltroOra||'';
-    filterOraSel.addEventListener('change',function(e){setState({_orarioFiltroOra:e.target.value});});
-
-    // Applica entrambi i filtri
-    const filtroOra=s._orarioFiltroOra||'';
-    let filtered=s.orario;
-    if(filtroGiorno) filtered=filtered.filter(r=>r.giorno===filtroGiorno);
-    if(filtroOra)    filtered=filtered.filter(r=>r.oInizio===filtroOra);
-
-    const thead=el('thead',{},[el('tr',{},[
-      'Giorno','Ora','Durata','Materia','Docente/i','Classe','Aula','Sede'
-    ].map(h=>el('th',{},h)))]);
-
-    const tbody=el('tbody',{});
-    if(s.orario.length===0){
-      tbody.appendChild(el('tr',{},[el('td',{colspan:'8',style:{color:'#999',padding:'1rem',textAlign:'center'}},'Nessun orario caricato. Importa un file CSV.')]));
-    } else if(filtered.length===0){
-      tbody.appendChild(el('tr',{},[el('td',{colspan:'8',style:{color:'#999',padding:'1rem',textAlign:'center'}},'Nessuna lezione trovata con i filtri selezionati.')]));
-    } else {
-      filtered.forEach(r=>{
-        const isDisp=r.mat_nome.toLowerCase().includes('disposizione');
-        tbody.appendChild(el('tr',{},[
-          el('td',{},r.giorno),
-          el('td',{},[el('strong',{},r.oInizio)]),
-          el('td',{},r.durata+'min'),
-          el('td',{},isDisp?el('span',{class:'pill pill-purple'},'Disposizione'):r.mat_nome),
-          el('td',{},[...r.doc_cogn.map(d=>el('span',{class:'docente-chip'},d))]),
-          el('td',{},r.classe||'—'),
-          el('td',{},r.aula||'—'),
-          el('td',{},[el('span',{class:'sede-'+(r.sede==='Betti'?'betti':'devincenti')},r.sede)])
-        ]));
-      });
+// --- RENDERING UI ---
+function render() {
+    const root = document.getElementById('app');
+    
+    if (!STATE.user) {
+        root.innerHTML = renderLogin();
+        return;
     }
 
-    content=el('div',{class:'card'},[
-      el('div',{style:{display:'flex',gap:'8px',marginBottom:'1rem',alignItems:'center',flexWrap:'wrap'}},[
-        el('label',{style:{fontSize:'0.82rem',color:'#555',fontWeight:600}},'Giorno:'),
-        filterGiornoSel,
-        el('label',{style:{fontSize:'0.82rem',color:'#555',fontWeight:600,marginLeft:'4px'}},'Ora:'),
-        filterOraSel,
-        el('span',{style:{fontSize:'0.83rem',color:'#888',marginLeft:'4px'}},filtered.length+' lezioni')
-      ]),
-      el('div',{class:'tbl-wrap'},[el('table',{},[thead,tbody])])
-    ]);
-  } else if(activeTab==='importa'){
-    const textarea=el('textarea',{rows:'12',style:{fontFamily:'monospace',fontSize:'0.78rem',resize:'vertical',width:'100%',border:'1px solid rgba(0,0,0,0.15)',borderRadius:'8px',padding:'0.55rem 0.75rem'}});
-    textarea.placeholder=CSV_ESEMPIO;
+    root.innerHTML = `
+        <div class="container">
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem">
+                <div>
+                    <h1>🏫 Gestione Sostituzioni</h1>
+                    <span class="status-online">● Database Cloud Connesso</span>
+                </div>
+                <button class="btn" onclick="logout()" style="background:#ef4444">Esci</button>
+            </header>
 
-    const inputFile=el('input',{type:'file',accept:'.csv,.txt',class:'hidden'});
-    inputFile.addEventListener('change',e=>{
-      const f=e.target.files[0];if(!f)return;
-      const reader=new FileReader();
-      reader.onload=ev=>{textarea.value=ev.target.result;};
-      reader.readAsText(f,'UTF-8');
-    });
+            <div class="card">
+                <h3>Nuova Sostituzione (Admin)</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px">
+                    <input type="date" id="new-data">
+                    <input type="text" id="new-doc-ass" placeholder="Docente Assente">
+                    <input type="text" id="new-doc-sos" placeholder="Docente Sostituto">
+                    <input type="text" id="new-classe" placeholder="Classe">
+                    <input type="number" id="new-ora" placeholder="Ora (es. 1)">
+                    <button class="btn" onclick="salvaNuova()">Invia a tutti</button>
+                </div>
+            </div>
 
-    const uploadArea=el('div',{class:'upload-area'},[
-      el('div',{style:{fontSize:'2rem'}},'📁'),
-      el('div',{style:{fontWeight:600,marginTop:'0.5rem'}},'Clicca per selezionare un file CSV'),
-      el('p',{style:{color:'#888',marginTop:'0.4rem',fontSize:'0.83rem'}},'oppure incolla il testo direttamente nel campo sottostante')
-    ]);
-    uploadArea.addEventListener('click',()=>inputFile.click());
-
-    content=el('div',{class:'card'},[
-      el('div',{class:'section-note'},[
-        'Formato colonne: ',el('code',{},'durata, mat_nome, doc_cogn, doc_nome, classe, aula, giorno, o.inizio, sede'),el('br',{}),
-        'Per più docenti stessa ora: separare cognomi con ',el('code',{},'punto e virgola (;)'),el('br',{}),
-        'Usare ',el('code',{},'"Disposizione"'),' come materia per i docenti disponibili alla sostituzione.',el('br',{}),
-        'I caratteri ',el('code',{},'#'),' all\'inizio riga indicano commenti da ignorare.'
-      ]),
-      inputFile,
-      uploadArea,
-      el('div',{class:'form-group',style:{marginTop:'1rem'}},[
-        el('label',{},'Contenuto CSV'),
-        textarea
-      ]),
-      el('div',{style:{display:'flex',gap:'8px'}},[
-        el('button',{class:'btn btn-outline btn-sm',onclick:()=>{textarea.value=CSV_ESEMPIO;}},'Carica esempio demo'),
-        el('button',{class:'btn btn-primary',onclick:()=>{
-          const txt=textarea.value||CSV_ESEMPIO;
-          try{
-            const rows=parseCSV(txt);
-            if(rows.length===0){addToast('⚠️ Nessuna riga valida trovata nel CSV');return;}
-            STATE.orario=rows;saveState('orario',rows);
-            addToast('✅ Orario importato: '+rows.length+' lezioni');
-            setState({_orarioTab:'visualizza'});
-          }catch(e){addToast('❌ Errore nel parsing del CSV: '+e.message);}
-        }},'📥 Importa orario')
-      ])
-    ]);
-  } else {
-    content=el('div',{class:'card'},[
-      el('p',{style:{marginBottom:'1rem'}},'Questa operazione elimina ',el('strong',{},'tutto'),' l\'orario caricato.'),
-      el('p',{style:{fontSize:'0.85rem',color:'#888',marginBottom:'1rem'}},'Eventuali assenze e sostituzioni già inserite rimarranno nel sistema.'),
-      el('button',{class:'btn btn-danger',onclick:()=>{
-        if(!confirm('Eliminare tutto l\'orario? L\'operazione non è reversibile.'))return;
-        STATE.orario=[];saveState('orario',[]);
-        addToast('✅ Orario eliminato');setState({_orarioTab:'visualizza'});
-      }},'🗑 Elimina tutto l\'orario')
-    ]);
-  }
-
-  return frag(
-    el('div',{class:'page-title'},'📅 Gestione Orario'),
-    el('div',{class:'day-tabs'},tabEls),
-    content
-  );
+            <div class="card">
+                <h3>Tabellone Sostituzioni</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Ora</th>
+                            <th>Classe</th>
+                            <th>Assente</th>
+                            <th>Sostituto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${STATE.sostituzioni.map(s => `
+                            <tr>
+                                <td>${s.data}</td>
+                                <td>${s.ora}°</td>
+                                <td><b>${s.classe}</b></td>
+                                <td>${s.docente_assente}</td>
+                                <td style="color:var(--primary); font-weight:bold">${s.docente_sostituto}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
 }
 
-// =============================================
-// UTENTI
-// =============================================
-function renderUtenti(){
-  const tbody=el('tbody',{});
-  STATE.users.forEach(u=>{
-    const editBtn=el('button',{class:'btn btn-outline btn-sm'},'✏️ Modifica');
-    editBtn.addEventListener('click',()=>apriModaleUtente(u));
-    const delBtn=el('button',{class:'btn btn-danger btn-sm',style:{marginLeft:'4px'}},'🗑');
-    delBtn.addEventListener('click',()=>{
-      if(u.id===STATE.currentUser.id){alert('Non puoi eliminare te stesso!');return;}
-      if(!confirm('Eliminare l\'utente '+u.cognome+'?'))return;
-      STATE.users=STATE.users.filter(x=>x.id!==u.id);
-      saveState('users',STATE.users);addToast('✅ Utente eliminato');render();
-    });
-    tbody.appendChild(el('tr',{},[
-      el('td',{},[el('strong',{},u.cognome+' '+u.nome)]),
-      el('td',{},[el('code',{},u.username)]),
-      el('td',{style:{fontSize:'0.82rem',color:'#555'}},u.email),
-      el('td',{},[el('span',{class:'pill '+(u.ruolo==='admin'?'pill-blue':'pill-green')},u.ruolo==='admin'?'Admin':'Docente')]),
-      el('td',{},[editBtn,u.id!==1?delBtn:null])
-    ]));
-  });
-
-  return frag(
-    el('div',{class:'page-title'},'👥 Gestione Utenti'),
-    el('div',{class:'card'},[
-      el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}},[
-        el('div',{class:'card-title',style:{marginBottom:0}},'Utenti del sistema'),
-        el('button',{class:'btn btn-primary btn-sm',onclick:()=>apriModaleUtente(null)},'+ Nuovo utente')
-      ]),
-      el('div',{class:'tbl-wrap'},[
-        el('table',{},[
-          el('thead',{},[el('tr',{},[el('th',{},'Nome'),el('th',{},'Username'),el('th',{},'Email istituzionale'),el('th',{},'Ruolo'),el('th',{},'Azioni')])]),
-          tbody
-        ])
-      ])
-    ])
-  );
+function renderLogin() {
+    return `
+        <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:var(--dark)">
+            <div class="card" style="width:350px">
+                <h2 style="text-align:center">Accesso al Sistema</h2>
+                <input type="text" id="user" placeholder="Username" style="width:100%; margin:10px 0; padding:12px">
+                <input type="password" id="pass" placeholder="Password" style="width:100%; margin:10px 0; padding:12px">
+                <button class="btn" onclick="login()" style="width:100%; margin-top:10px">ENTRA</button>
+            </div>
+        </div>
+    `;
 }
 
-function apriModaleUtente(utente){
-  const isEdit=!!utente;
-  const errDiv=el('div',{class:'err-msg hidden'});
-  const inpNome=el('input',{type:'text',value:utente?utente.nome:'',placeholder:'es. Marco'});
-  const inpCogn=el('input',{type:'text',value:utente?utente.cognome:'',placeholder:'es. Rossi'});
-  const inpUser=el('input',{type:'text',value:utente?utente.username:'',placeholder:'es. rossi'});
-  if(isEdit)inpUser.disabled=true;
-  const inpPass=el('input',{type:'password',value:utente?utente.password:'',placeholder:'password'});
-  const inpEmail=el('input',{type:'email',value:utente?utente.email:'',placeholder:'nome.cognome@scuola.edu'});
-  const selRuolo=el('select',{});
-  [['docente','Docente'],['admin','Amministratore']].forEach(([v,l])=>{
-    const o=el('option',{value:v},l);
-    if(utente&&utente.ruolo===v)o.selected=true;
-    selRuolo.appendChild(o);
-  });
-
-  const formBody=el('div',{},[
-    errDiv,
-    el('div',{class:'grid2'},[
-      el('div',{class:'form-group'},[el('label',{},'Nome'),inpNome]),
-      el('div',{class:'form-group'},[el('label',{},'Cognome'),inpCogn])
-    ]),
-    el('div',{class:'form-group'},[el('label',{},'Username'),inpUser]),
-    el('div',{class:'form-group'},[el('label',{},'Password'),inpPass]),
-    el('div',{class:'form-group'},[el('label',{},'Email istituzionale'),inpEmail]),
-    el('div',{class:'form-group'},[el('label',{},'Ruolo'),selRuolo])
-  ]);
-
-  function submit(){
-    const nome=inpNome.value.trim(),cogn=inpCogn.value.trim(),user=isEdit?utente.username:inpUser.value.trim();
-    const pass=inpPass.value,email=inpEmail.value.trim(),ruolo=selRuolo.value;
-    if(!nome||!cogn||!user||!pass||!email){errDiv.textContent='Compila tutti i campi';errDiv.className='err-msg';return;}
-    if(!isEdit&&STATE.users.find(u=>u.username===user)){errDiv.textContent='Username già esistente';errDiv.className='err-msg';return;}
-    if(isEdit){
-      STATE.users=STATE.users.map(u=>u.id===utente.id?{...u,nome,cognome:cogn,password:pass,email,ruolo}:u);
-    } else {
-      STATE.users=[...STATE.users,{id:Date.now(),username:user,password:pass,nome,cognome:cogn,ruolo,email}];
-    }
-    saveState('users',STATE.users);
-    addToast('✅ Utente '+(isEdit?'modificato':'creato')+': '+cogn+' '+nome);
-    setState({modal:null});
-  }
-
-  setState({modal:{
-    title:(isEdit?'✏️ Modifica utente':'➕ Nuovo utente'),
-    body:formBody,
-    actions:[
-      {label:'Annulla',cls:'btn btn-outline',cb:()=>setState({modal:null})},
-      {label:isEdit?'Salva modifiche':'Crea utente',cls:'btn btn-primary',cb:submit}
-    ]
-  }});
+// --- AZIONI ---
+function login() {
+    // Semplificato per demo. Supabase ha anche Auth integrata se serve.
+    STATE.user = { nome: "Admin" };
+    fetchSostituzioni();
 }
 
-// =============================================
-// EMAIL LOG
-// =============================================
-function renderEmail(){
-  const logs=STATE.emailLog;
-  return frag(
-    el('div',{class:'page-title'},'📧 Log Notifiche Email (simulate)'),
-    el('div',{class:'section-note'},'Le email vengono simulate internamente. In un deploy reale, questo sistema si collegherebbe a un server SMTP istituzionale.'),
-    el('div',{class:'card'},[
-      el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}},[
-        el('div',{class:'card-title',style:{marginBottom:0}},logs.length+' notifiche inviate'),
-        logs.length>0?el('button',{class:'btn btn-outline btn-sm',onclick:()=>{if(confirm('Cancellare il log?')){STATE.emailLog=[];saveState('emailLog',[]);render();}}},'🗑 Cancella log'):null
-      ]),
-      logs.length===0?el('p',{style:{color:'#999',fontSize:'0.85rem'}},'Nessuna email inviata'):
-      frag(...logs.map(m=>el('div',{class:'notif notif-ok',style:{marginBottom:'6px',fontFamily:'monospace',fontSize:'0.78rem',wordBreak:'break-all'}},m)))
-    ])
-  );
+function logout() {
+    STATE.user = null;
+    render();
 }
 
-// =============================================
-// MODAL
-// =============================================
-function renderModal(){
-  const m=STATE.modal;
-  if(!m)return null;
-
-  const bg=el('div',{class:'modal-bg'});
-  const modal=el('div',{class:'modal'});
-
-  const titleBar=el('div',{class:'modal-title'},[
-    m.title,
-    el('button',{class:'modal-close',onclick:()=>setState({modal:null})},'✕')
-  ]);
-
-  const actions=el('div',{class:'modal-actions'},
-    m.actions.map(a=>{const b=el('button',{class:a.cls},a.label);b.addEventListener('click',a.cb);return b;})
-  );
-
-  modal.appendChild(titleBar);
-  modal.appendChild(m.body);
-  modal.appendChild(actions);
-  bg.appendChild(modal);
-  bg.addEventListener('click',e=>{if(e.target===bg)setState({modal:null});});
-  return bg;
+async function salvaNuova() {
+    const payload = {
+        data: document.getElementById('new-data').value,
+        docente_assente: document.getElementById('new-doc-ass').value,
+        docente_sostituto: document.getElementById('new-doc-sos').value,
+        classe: document.getElementById('new-classe').value,
+        ora: parseInt(document.getElementById('new-ora').value)
+    };
+    await aggiungiSostituzione(payload);
 }
 
-// =============================================
-// AVVIO
-// =============================================
+// Avvio
 render();
 </script>
 </body>
