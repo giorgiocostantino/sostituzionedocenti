@@ -161,6 +161,60 @@ async function salvaNuova() {
 
 // Avvio
 render();
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script>
+    // Inizializza EmailJS con la tua Public Key
+    (function() {
+        emailjs.init("737902208627-srevsu80tjcka6q1799kbtobgk422c93.apps.googleusercontent.com");
+    })();
+
+    // Funzione per inviare l'email
+    async function inviaNotificaEmail(dati) {
+        // Costruiamo la mail istituzionale (es. nome.cognome@ettoreconti.edu.it)
+        // Se hai una lista di email nel DB Supabase, puoi recuperarla da lì
+        const emailDestinatario = dati.docente_sostituto.toLowerCase().replace(' ', '.') + "@ettoreconti.edu.it";
+
+        const templateParams = {
+            docente_sostituto: dati.docente_sostituto,
+            data: dati.data,
+            ora: dati.ora,
+            classe: dati.classe,
+            docente_assente: dati.docente_assente,
+            to_email: emailDestinatario 
+        };
+
+        try {
+            await emailjs.send('737902208627-srevsu80tjcka6q1799kbtobgk422c93.apps.googleusercontent.com', 'IL_TUO_TEMPLATE_ID', templateParams);
+            console.log("Email inviata con successo a " + emailDestinatario);
+        } catch (error) {
+            console.error("Errore invio email:", error);
+        }
+    }
+
+    // Modifica la funzione salvaNuova del precedente codice
+    async function salvaNuova() {
+        const payload = {
+            data: document.getElementById('new-data').value,
+            docente_assente: document.getElementById('new-doc-ass').value,
+            docente_sostituto: document.getElementById('new-doc-sos').value,
+            classe: document.getElementById('new-classe').value,
+            ora: parseInt(document.getElementById('new-ora').value)
+        };
+
+        // 1. Salva su Supabase
+        const { error } = await supabase.from('sostituzioni').insert([payload]);
+        
+        if (error) {
+            alert("Errore salvataggio database");
+        } else {
+            // 2. Se il salvataggio riesce, invia la mail
+            await inviaNotificaEmail(payload);
+            alert("Sostituzione salvata e email inviata!");
+            fetchSostituzioni(); // Ricarica la tabella
+        }
+    }
+</script>
 </script>
 </body>
 </html>
