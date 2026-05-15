@@ -356,14 +356,15 @@
                 <div class="live-dot"></div>
                 Database connesso
             </div>
+            <span id="ruolo-badge" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"></span>
             <button class="btn btn-danger" onclick="doLogout()">Esci</button>
         </div>
     </div>
 
     <div class="container">
 
-        <!-- Form nuova sostituzione -->
-        <div class="card">
+        <!-- Form nuova sostituzione (solo admin) -->
+        <div class="card" id="form-inserimento" style="display:none">
             <div class="card-title">📋 Nuova Sostituzione</div>
             <div class="form-grid">
                 <div class="form-group">
@@ -437,9 +438,9 @@ const SUPABASE_URL = 'https://rzrydtbhxqzmyerakdrm.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6cnlkdGJoeHF6bXllcmFrZHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjkxMjcsImV4cCI6MjA5NDM0NTEyN30.ERUG7DB20zbmv8hAX1CYsceOl94XcB7inOV9IihkOWw';
 
 // EmailJS: la trovi in Account → API Keys sulla dashboard EmailJS
-const EMAILJS_PUBLIC_KEY  = 'urO34H4uuAP3_1ov4';    // es. "user_AbCdEfGhIjKlMn"
+const EMAILJS_PUBLIC_KEY  = 'urO34H4uuAP3_1ov4';
 // EmailJS: il Service ID del servizio Gmail/Outlook che hai collegato
-const EMAILJS_SERVICE_ID  = 'service_lwjydpt';       // es. "service_abc123"
+const EMAILJS_SERVICE_ID  = 'service_lwjydpt';
 // EmailJS: il Template ID del template che hai creato
 const EMAILJS_TEMPLATE_ID = 'template_8ay111r';
 
@@ -458,6 +459,7 @@ emailjs.init(EMAILJS_PUBLIC_KEY);
 // STATE
 // ─────────────────────────────────────────────────────────────
 let sostituzioni = [];
+let currentRuolo = null; // 'admin' | 'docente'
 
 // ─────────────────────────────────────────────────────────────
 // AUTH — usa Supabase Auth reale (FIX #7)
@@ -504,15 +506,43 @@ async function doLogout() {
     document.getElementById('login-btn').textContent = 'Accedi';
 }
 
-function showApp() {
+async function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display   = 'block';
 
     // Imposta la data di oggi come default
     document.getElementById('new-data').value = new Date().toISOString().split('T')[0];
 
+    // Leggi il ruolo dell'utente dalla tabella profiles
+    const { data: { user } } = await db.auth.getUser();
+    const { data: profile, error: profileError } = await db
+        .from('profiles')
+        .select('ruolo')
+        .eq('id', user.id)
+        .single();
+
+    if (profileError || !profile) {
+        // Nessun profilo trovato: accesso negato
+        showToast('Accesso non autorizzato. Contatta l\'amministratore.', 'error');
+        await db.auth.signOut();
+        document.getElementById('app-screen').style.display  = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        return;
+    }
+
+    currentRuolo = profile.ruolo;
+
+    // Mostra il form di inserimento solo agli admin
+    const formCard = document.getElementById('form-inserimento');
+    formCard.style.display = currentRuolo === 'admin' ? 'block' : 'none';
+
+    // Aggiorna il badge ruolo nella topbar
+    document.getElementById('ruolo-badge').textContent =
+        currentRuolo === 'admin' ? '👤 Amministratore' : '👤 Docente';
+
     fetchSostituzioni();
-    // FIX #9 (bonus): realtime live updates
+
+    // Realtime live updates
     db.channel('sostituzioni-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sostituzioni' }, fetchSostituzioni)
       .subscribe();
