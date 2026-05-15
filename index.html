@@ -3,218 +3,685 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Sostituzioni Docenti — Live</title>
+    <title>Gestione Sostituzioni — Istituto Ettore Conti</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /*  */
-        :root { --primary: #1a56a0; --dark: #102a4d; --bg: #f8fafc; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1rem; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn:hover { opacity: 0.9; }
-        .status-online { color: #10b981; font-size: 0.8rem; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
-        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
+        :root {
+            --primary: #1a56a0;
+            --primary-dark: #0f3a72;
+            --primary-light: #dbeafe;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── LOGIN ── */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        .login-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 360px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-logo h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .login-logo p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--surface);
+            transition: border-color 0.15s;
+            outline: none;
+        }
+
+        .form-control:focus { border-color: var(--primary); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 0.5rem; padding: 12px; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        /* ── APP SHELL ── */
+        #app-screen { display: none; }
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .topbar-brand span { font-size: 1.3rem; }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--success);
+            background: #d1fae5;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+        /* ── FORM CARD ── */
+        .card {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-grid .form-group { margin-bottom: 0; }
+
+        /* ── TABLE ── */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--bg); }
+
+        tbody td {
+            padding: 12px 14px;
+            color: var(--text);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        .pill-ora { background: var(--primary-light); color: var(--primary-dark); }
+        .pill-classe { background: #f3f4f6; color: #374151; }
+
+        .sostituto-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ── STATES ── */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .empty-state p { font-size: 0.9rem; }
+
+        .loading-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--text);
+            color: white;
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .topbar { padding: 0 1rem; }
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh;">
-        <p>Caricamento sistema...</p>
+<!-- ════════════════════════════════
+     LOGIN
+════════════════════════════════ -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="icon">🏫</div>
+            <h1>Istituto Ettore Conti</h1>
+            <p>Sistema Gestione Sostituzioni</p>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" id="login-email" placeholder="nome@ettoreconti.edu.it">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input class="form-control" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+        </div>
+        <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Accedi</button>
+        <div class="error-msg" id="login-error"></div>
     </div>
 </div>
 
-<script>
-// --- CONFIGURAZIONE SUPABASE ---
-// Sostituisci questi valori con quelli del tuo progetto Supabase
-const SUPABASE_URL = 'sb_publishable_QpKVh93RqZvgvL1IzY1Qrw_qGkOk2zj';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6cnlkdGJoeHF6bXllcmFrZHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjkxMjcsImV4cCI6MjA5NDM0NTEyN30.ERUG7DB20zbmv8hAX1CYsceOl94XcB7inOV9IihkOWw';
-const supabase = lib.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<!-- ════════════════════════════════
+     APP
+════════════════════════════════ -->
+<div id="app-screen">
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>🏫</span> Gestione Sostituzioni
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                Database connesso
+            </div>
+            <button class="btn btn-danger" onclick="doLogout()">Esci</button>
+        </div>
+    </div>
 
-let STATE = {
-    user: null,
-    view: 'home',
-    sostituzioni: []
-};
+    <div class="container">
 
-// --- LOGICA DATI ---
-async function fetchSostituzioni() {
-    const { data, error } = await supabase
-        .from('sostituzioni')
-        .select('*')
-        .order('data', { ascending: false });
-    
-    if (error) console.error("Errore fetch:", error);
-    else {
-        STATE.sostituzioni = data;
-        render();
-    }
-}
-
-async function aggiungiSostituzione(payload) {
-    const { error } = await supabase
-        .from('sostituzioni')
-        .insert([payload]);
-    
-    if (error) alert("Errore nel salvataggio!");
-    else fetchSostituzioni();
-}
-
-// --- RENDERING UI ---
-function render() {
-    const root = document.getElementById('app');
-    
-    if (!STATE.user) {
-        root.innerHTML = renderLogin();
-        return;
-    }
-
-    root.innerHTML = `
-        <div class="container">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem">
-                <div>
-                    <h1>🏫 Gestione Sostituzioni</h1>
-                    <span class="status-online">● Database Cloud Connesso</span>
+        <!-- Form nuova sostituzione -->
+        <div class="card">
+            <div class="card-title">📋 Nuova Sostituzione</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Data</label>
+                    <input class="form-control" type="date" id="new-data">
                 </div>
-                <button class="btn" onclick="logout()" style="background:#ef4444">Esci</button>
-            </header>
-
-            <div class="card">
-                <h3>Nuova Sostituzione (Admin)</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px">
-                    <input type="date" id="new-data">
-                    <input type="text" id="new-doc-ass" placeholder="Docente Assente">
-                    <input type="text" id="new-doc-sos" placeholder="Docente Sostituto">
-                    <input type="text" id="new-classe" placeholder="Classe">
-                    <input type="number" id="new-ora" placeholder="Ora (es. 1)">
-                    <button class="btn" onclick="salvaNuova()">Invia a tutti</button>
+                <div class="form-group">
+                    <label>Ora</label>
+                    <input class="form-control" type="number" id="new-ora" placeholder="1–8" min="1" max="8">
+                </div>
+                <div class="form-group">
+                    <label>Classe</label>
+                    <input class="form-control" type="text" id="new-classe" placeholder="es. 3A">
+                </div>
+                <div class="form-group">
+                    <label>Docente Assente</label>
+                    <input class="form-control" type="text" id="new-doc-ass" placeholder="Nome Cognome">
+                </div>
+                <div class="form-group">
+                    <label>Docente Sostituto</label>
+                    <input class="form-control" type="text" id="new-doc-sos" placeholder="Nome Cognome">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-success" id="submit-btn" onclick="salvaNuova()" style="width:100%">
+                        ✉️ Salva e invia email
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <div class="card">
-                <h3>Tabellone Sostituzioni</h3>
+        <!-- Tabella sostituzioni -->
+        <div class="card">
+            <div class="card-title">📅 Tabellone Sostituzioni</div>
+            <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Data</th>
                             <th>Ora</th>
                             <th>Classe</th>
-                            <th>Assente</th>
-                            <th>Sostituto</th>
+                            <th>Docente Assente</th>
+                            <th>Docente Sostituto</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${STATE.sostituzioni.map(s => `
-                            <tr>
-                                <td>${s.data}</td>
-                                <td>${s.ora}°</td>
-                                <td><b>${s.classe}</b></td>
-                                <td>${s.docente_assente}</td>
-                                <td style="color:var(--primary); font-weight:bold">${s.docente_sostituto}</td>
-                            </tr>
-                        `).join('')}
+                    <tbody id="table-body">
+                        <tr class="loading-row"><td colspan="5">Caricamento...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-    `;
+
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════
+     SCRIPT 1 — Supabase + EmailJS
+════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONFIGURAZIONE — sostituisci con i tuoi valori reali
+// ─────────────────────────────────────────────────────────────
+
+// Supabase: URL formato https://<ref>.supabase.co
+const SUPABASE_URL = 'https://rzrydtbhxqzmyerakdrm.supabase.co';
+// Supabase: chiave anon pubblica (quella JWT lunga)
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6cnlkdGJoeHF6bXllcmFrZHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjkxMjcsImV4cCI6MjA5NDM0NTEyN30.ERUG7DB20zbmv8hAX1CYsceOl94XcB7inOV9IihkOWw';
+
+// EmailJS: la trovi in Account → API Keys sulla dashboard EmailJS
+const EMAILJS_PUBLIC_KEY  = 'LA_TUA_PUBLIC_KEY';    // es. "user_AbCdEfGhIjKlMn"
+// EmailJS: il Service ID del servizio Gmail/Outlook che hai collegato
+const EMAILJS_SERVICE_ID  = 'service_xxxxxxx';       // es. "service_abc123"
+// EmailJS: il Template ID del template che hai creato
+const EMAILJS_TEMPLATE_ID = 'template_8ay111r';
+
+// ─────────────────────────────────────────────────────────────
+// INIZIALIZZAZIONE
+// ─────────────────────────────────────────────────────────────
+
+// FIX #1 + #2: namespace corretto per Supabase v2 da CDN
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// FIX #5: usa la Public Key di EmailJS, non il Client ID Google
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let sostituzioni = [];
+
+// ─────────────────────────────────────────────────────────────
+// AUTH — usa Supabase Auth reale (FIX #7)
+// ─────────────────────────────────────────────────────────────
+
+async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    const btn   = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+
+    if (!email || !pass) {
+        showLoginError('Inserisci email e password.');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Accesso in corso...';
+    errEl.style.display = 'none';
+
+    const { error } = await db.auth.signInWithPassword({ email, password: pass });
+
+    if (error) {
+        showLoginError('Credenziali non valide. Riprova.');
+        btn.disabled = false;
+        btn.textContent = 'Accedi';
+        return;
+    }
+
+    showApp();
 }
 
-function renderLogin() {
-    return `
-        <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:var(--dark)">
-            <div class="card" style="width:350px">
-                <h2 style="text-align:center">Accesso al Sistema</h2>
-                <input type="text" id="user" placeholder="Username" style="width:100%; margin:10px 0; padding:12px">
-                <input type="password" id="pass" placeholder="Password" style="width:100%; margin:10px 0; padding:12px">
-                <button class="btn" onclick="login()" style="width:100%; margin-top:10px">ENTRA</button>
-            </div>
-        </div>
-    `;
+function showLoginError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg;
+    el.style.display = 'block';
 }
 
-// --- AZIONI ---
-function login() {
-    // Semplificato per demo. Supabase ha anche Auth integrata se serve.
-    STATE.user = { nome: "Admin" };
+async function doLogout() {
+    await db.auth.signOut();
+    document.getElementById('app-screen').style.display  = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').textContent = 'Accedi';
+}
+
+function showApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display   = 'block';
+
+    // Imposta la data di oggi come default
+    document.getElementById('new-data').value = new Date().toISOString().split('T')[0];
+
+    fetchSostituzioni();
+    // FIX #9 (bonus): realtime live updates
+    db.channel('sostituzioni-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sostituzioni' }, fetchSostituzioni)
+      .subscribe();
+}
+
+// Controlla sessione esistente all'avvio
+db.auth.getSession().then(({ data }) => {
+    if (data.session) showApp();
+});
+
+// ─────────────────────────────────────────────────────────────
+// DATI
+// ─────────────────────────────────────────────────────────────
+
+async function fetchSostituzioni() {
+    const { data, error } = await db
+        .from('sostituzioni')
+        .select('*')
+        .order('data', { ascending: false });
+
+    if (error) {
+        console.error('Errore fetch sostituzioni:', error);
+        return;
+    }
+
+    sostituzioni = data || [];
+    renderTable();
+}
+
+// ─────────────────────────────────────────────────────────────
+// SALVA — FIX #4: una sola funzione per DB + email
+// ─────────────────────────────────────────────────────────────
+
+async function salvaNuova() {
+    const data   = document.getElementById('new-data').value;
+    const ora    = document.getElementById('new-ora').value;
+    const classe = document.getElementById('new-classe').value.trim();
+    const assente    = document.getElementById('new-doc-ass').value.trim();
+    const sostituto  = document.getElementById('new-doc-sos').value.trim();
+
+    // FIX #8: validazione campi
+    if (!data || !ora || !classe || !assente || !sostituto) {
+        showToast('Compila tutti i campi prima di salvare.', 'error');
+        return;
+    }
+
+    if (parseInt(ora) < 1 || parseInt(ora) > 8) {
+        showToast("L'ora deve essere tra 1 e 8.", 'error');
+        return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Salvataggio...';
+
+    const payload = {
+        data,
+        ora: parseInt(ora),
+        classe,
+        docente_assente:   assente,
+        docente_sostituto: sostituto,
+    };
+
+    // 1. Salva su Supabase
+    const { error } = await db.from('sostituzioni').insert([payload]);
+
+    if (error) {
+        showToast('Errore nel salvataggio sul database.', 'error');
+        console.error(error);
+        btn.disabled = false;
+        btn.textContent = '✉️ Salva e invia email';
+        return;
+    }
+
+    // 2. Invia email con EmailJS
+    await inviaEmail(payload);
+
+    // Reset form
+    document.getElementById('new-ora').value     = '';
+    document.getElementById('new-classe').value  = '';
+    document.getElementById('new-doc-ass').value = '';
+    document.getElementById('new-doc-sos').value = '';
+
+    btn.disabled = false;
+    btn.textContent = '✉️ Salva e invia email';
+
     fetchSostituzioni();
 }
 
-function logout() {
-    STATE.user = null;
-    render();
-}
+// ─────────────────────────────────────────────────────────────
+// EMAIL — FIX #5 + #6: credenziali EmailJS corrette
+//         FIX #10: regex /\s+/g per nomi multipli
+// ─────────────────────────────────────────────────────────────
 
-async function salvaNuova() {
-    const payload = {
-        data: document.getElementById('new-data').value,
-        docente_assente: document.getElementById('new-doc-ass').value,
-        docente_sostituto: document.getElementById('new-doc-sos').value,
-        classe: document.getElementById('new-classe').value,
-        ora: parseInt(document.getElementById('new-ora').value)
+async function inviaEmail(dati) {
+    // FIX #10: replace con regex global per gestire nomi come "Maria Elena Rossi"
+    const emailDest = dati.docente_sostituto
+        .toLowerCase()
+        .replace(/\s+/g, '.')
+        + '@ettoreconti.edu.it';
+
+    const templateParams = {
+        to_email:          emailDest,
+        docente_sostituto: dati.docente_sostituto,
+        docente_assente:   dati.docente_assente,
+        data:              dati.data,
+        ora:               dati.ora,
+        classe:            dati.classe,
     };
-    await aggiungiSostituzione(payload);
+
+    try {
+        // FIX #6: EMAILJS_SERVICE_ID separato dalla Public Key
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+        showToast('Sostituzione salvata ✓ Email inviata a ' + emailDest, 'success');
+    } catch (err) {
+        console.error('Errore invio email:', err);
+        // Il record è già salvato — avvisiamo ma non blocchiamo
+        showToast('Salvato nel DB, ma errore invio email. Controlla la console.', 'error');
+    }
 }
 
-// Avvio
-render();
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+// ─────────────────────────────────────────────────────────────
+// RENDERING TABELLA
+// ─────────────────────────────────────────────────────────────
 
-<script>
-    // Inizializza EmailJS con la tua Public Key
-    (function() {
-        emailjs.init("737902208627-srevsu80tjcka6q1799kbtobgk422c93.apps.googleusercontent.com");
-    })();
+function renderTable() {
+    const tbody = document.getElementById('table-body');
 
-    // Funzione per inviare l'email
-    async function inviaNotificaEmail(dati) {
-        // Costruiamo la mail istituzionale (es. nome.cognome@ettoreconti.edu.it)
-        // Se hai una lista di email nel DB Supabase, puoi recuperarla da lì
-        const emailDestinatario = dati.docente_sostituto.toLowerCase().replace(' ', '.') + "@ettoreconti.edu.it";
-
-        const templateParams = {
-            docente_sostituto: dati.docente_sostituto,
-            data: dati.data,
-            ora: dati.ora,
-            classe: dati.classe,
-            docente_assente: dati.docente_assente,
-            to_email: emailDestinatario 
-        };
-
-        try {
-            await emailjs.send('737902208627-srevsu80tjcka6q1799kbtobgk422c93.apps.googleusercontent.com', 'template_8ay111r', templateParams);
-            console.log("Email inviata con successo a " + emailDestinatario);
-        } catch (error) {
-            console.error("Errore invio email:", error);
-        }
+    if (!sostituzioni.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>Nessuna sostituzione registrata.</p>
+                    </div>
+                </td>
+            </tr>`;
+        return;
     }
 
-    // Modifica la funzione salvaNuova del precedente codice
-    async function salvaNuova() {
-        const payload = {
-            data: document.getElementById('new-data').value,
-            docente_assente: document.getElementById('new-doc-ass').value,
-            docente_sostituto: document.getElementById('new-doc-sos').value,
-            classe: document.getElementById('new-classe').value,
-            ora: parseInt(document.getElementById('new-ora').value)
-        };
+    tbody.innerHTML = sostituzioni.map(s => {
+        const dataFmt = new Date(s.data).toLocaleDateString('it-IT', {
+            weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        return `
+            <tr>
+                <td>${dataFmt}</td>
+                <td><span class="pill pill-ora">${s.ora}ª ora</span></td>
+                <td><span class="pill pill-classe">${s.classe}</span></td>
+                <td>${s.docente_assente}</td>
+                <td class="sostituto-name">${s.docente_sostituto}</td>
+            </tr>`;
+    }).join('');
+}
 
-        // 1. Salva su Supabase
-        const { error } = await supabase.from('sostituzioni').insert([payload]);
-        
-        if (error) {
-            alert("Errore salvataggio database");
-        } else {
-            // 2. Se il salvataggio riesce, invia la mail
-            await inviaNotificaEmail(payload);
-            alert("Sostituzione salvata e email inviata!");
-            fetchSostituzioni(); // Ricarica la tabella
-        }
-    }
+// ─────────────────────────────────────────────────────────────
+// TOAST NOTIFICATIONS
+// ─────────────────────────────────────────────────────────────
+
+let toastTimer;
+function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = 'toast'; }, 4000);
+}
 </script>
-</script>
+
 </body>
 </html>
